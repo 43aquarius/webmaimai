@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://maimai.sega.com",
+    "name": "Other Elements 1｜maimai DX International ver. - SEGA",
+    "snippet": "DX RATING . The rating system has become more deluxe! We call it \"DX RATING \" now. Click here for maimai DX -NET. オトモダチ対戦.",
+    "host_name": "maimai.sega.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://myjian.github.io",
+    "name": "maimai DX Rating Lookup Table & Visualization",
+    "snippet": "Calculator. Level, Achievement, Rating . 280. Rank, Achievement, Factor, Rating - 13. SSS+, 100.5, 0.224, 292. SSS, 100, 0.216, 280. SS+, 99.5, 0.211, 272. SS ...",
+    "host_name": "myjian.github.io",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.bilibili.com",
+    "name": "探索隐藏在舞萌DX达成率以及底分(DX Rating)背后的算法【",
+    "snippet": "因为每次游玩结果都会得到一个基于谱面定数和玩家表现的 单曲Rating 。 这个数字的 计算公式 是：. 单曲Rating = 谱面定数* 达成率* Rating 因子(Score multiplier).",
+    "host_name": "www.bilibili.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.gamer.com.tw",
+    "name": "【攻略】DX RATING計算工具@maimai 精華區 - 哈啦區",
+    "snippet": "2020年6月18日 — 使用 方法 是根據自己的 MAIMAI NET跟內部難度表找出最新版本的前15首跟舊版的25首. 並填入每一個數值. 第一次找還蠻累的，不過之後只要打歌升R的時候去 ...",
+    "host_name": "forum.gamer.com.tw",
+    "rank": 3,
+    "date": "2020年6月18日",
+    "favicon": ""
+  },
+  {
+    "url": "https://zh.moegirl.org.cn",
+    "name": "maimai - 萌娘百科万物皆可萌的百科全书",
+    "snippet": "4天前 — 谱面的DX Rating 值通过以下 公式计算 并向下取整：. “DX Rating 值= 谱面定数* 达成率* 评级 系数 + AP额外奖励（1分，自 maimai DX CiRCLE版本起 ...",
+    "host_name": "zh.moegirl.org.cn",
+    "rank": 4,
+    "date": "Sep 20, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.zhihu.com",
+    "name": "maimai的rating分如何计算？",
+    "snippet": "2022年3月6日 — 底分是由25首标准谱最好成绩以及15首 DX 谱最好成绩经过 计算 得出的，（最好成绩中同一张谱面不会出现两次，但是一首曲目的标准谱和 DX 谱可以同时出现）。",
+    "host_name": "www.zhihu.com",
+    "rank": 5,
+    "date": "2022年3月6日",
+    "favicon": ""
+  }
+]

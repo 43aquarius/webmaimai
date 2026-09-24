@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1. **布局适配**：封面转盘、底部难度条（BASIC-MASTER）及“GO”按钮均可见，且垂直分布合理，无重叠。\n2. **溢出/裁切**：所有元素均在屏幕边界内，未见溢出或被裁切情况。\n3. **整体可用性**：界面结构完整，核心交互元素（选曲、选难、开始）位置清晰，整体可用。\n\n**结论**：该界面在 390x844 竖屏下布局正常，显示完整。",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1790223550,
+  "id": "20260924121905b3ced3ac150545c7",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20260924121905b3ced3ac150545c7",
+  "usage": {
+    "completion_tokens": 117,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 459,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 576
+  }
+}

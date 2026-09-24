@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) **整体布局与主要元素**：\n   - **背景**：深色科技感背景，带有发光的同心圆环（模拟游戏机台界面）。\n   - **左侧文字区**：顶部有“SEGA · rhythm game”小字；中间是巨大的粉色“maimai”Logo及白色“舞萌 for WEB”副标题；下方有版本说明；核心是一个带边框的“PRESS START”大按钮，左下角还有“? 玩法说明”按钮及版权信息。\n   - **右侧立绘**：一张色彩鲜艳、高对比度的二次元DJ少女立绘图片。\n\n2) **渲染错误/破碎布局/乱码**：**无**。页面元素排列整齐，没有明显的错位、重叠或图像加载失败导致的破碎感，也没有乱码字符。\n\n3) **文字清晰度**：**非常清晰**。所有文字（包括英文、中文和数字）边缘锐利，颜色对比度高（如粉字、白字在深色背景上），完全可读。",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1790223107,
+  "id": "20260924121140ad83f2f355ff4419",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20260924121140ad83f2f355ff4419",
+  "usage": {
+    "completion_tokens": 224,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 930,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1154
+  }
+}

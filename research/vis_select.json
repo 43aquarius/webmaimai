@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) **布局元素**：包含顶部**分类标签栏**（全部/maimai等）、左侧**歌曲信息栏**（曲名、艺术家、BPM及四色**难度条**）、中央**封面转盘**（当前选中封面及左右切换箭头）、右侧**操作提示/开始按钮**，以及底部**难度选择器**。\n2) **渲染状态**：界面渲染完整，无明显的错误或空白区域。\n3) **封面数量**：不能。画面中仅清晰展示了**1张**主选封面（右侧仅露出下一张的极小边缘），无法看到5张完整的歌曲封面。",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1790223124,
+  "id": "202609241211597a924bcc47f24fbb",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "202609241211597a924bcc47f24fbb",
+  "usage": {
+    "completion_tokens": 136,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 936,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1072
+  }
+}

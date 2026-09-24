@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) **音符类型多样性**：画面中目前仅清晰可见**粉色TAP音符**（位于轨道2处），未同时展示青色星形SLIDE、金色BREAK或绿色TOUCH等其他类型。\n2) **连击数与判定文字**：屏幕中央显示连击数为 **11 COMBO**；当前画面为游玩过程中，未显示具体的判定文字（如PERFECT/CRITICAL等）。\n3) **达成率数值**：顶部显示当前达成率为 **2.9101%**。\n4) **整体视觉效果评价**：界面采用经典的圆形轨道设计，具有强烈的科技感与舞台纵深效果（聚光灯、观众席剪影），色彩以深蓝和紫色调为主，视觉中心突出，氛围感营造出色。",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1790223630,
+  "id": "2026092412202499f8939d9eb64207",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "2026092412202499f8939d9eb64207",
+  "usage": {
+    "completion_tokens": 163,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2788,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2951
+  }
+}

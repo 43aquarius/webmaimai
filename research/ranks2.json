@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://maimai.fandom.com",
+    "name": "遊戲簡介| Maimai中文维基| Fandom",
+    "snippet": "加分，以橙紅色表示，分數是TAP 的5 倍，判定比TAP 更細，拍點越準即能得到越高的額外分數。每個譜面都有BREAK，所以譜面之 達成率 皆會超過100.00%，BREAK 數量多寡影響達成 ...",
+    "host_name": "maimai.fandom.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://zh.wikipedia.org",
+    "name": "maimai版本列表- 維基百科，自由的百科全書",
+    "snippet": "達成率等級 些許調整。 新增E、F、 AAA 、SSS 評價 。 現在 達成率97 %為 S 、 達成率99 %為 SS 、 達成率 100%為SSS。 現在選擇歌曲後可以直接調整難度了。 隨機選曲亦同。 「取消 ...",
+    "host_name": "zh.wikipedia.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://myjian.github.io",
+    "name": "maimai DX R值圖表",
+    "snippet": "等級 , 達成率 , R 值. 280. Rank, 達成率 , 係數, R 值- 13. SSS+, 100.5, 0.224, 292. SSS, 100, 0.216, 280. SS+, 99.5, 0.211, 272. SS , 99 , 0.208, 267. S+, 98, 0.203 ...",
+    "host_name": "myjian.github.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://zh.moegirl.org.cn",
+    "name": "maimai - 萌娘百科萬物皆可萌的百科全書",
+    "snippet": "ボーダー S （超過 S 級）： 達成率 不低於 S 評級時，顯示當前 達成率 （101-）與 S 評級 達成率 的差值。 ボーダー SS （超過 SS 級）： 達成率 不低於 SS 評級時，顯示當前 達成率 （101 ...",
+    "host_name": "zh.moegirl.org.cn",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://zhuanlan.zhihu.com",
+    "name": "maimai新人入坑全攻略",
+    "snippet": "2021年10月10日 — 当一首歌的准确率达到 94 %（ AAA 评级）以上时，说明你可以大体驾驭这个难度的歌曲了。达到 97 %（ S 评级）以上时，则可以适当增加一些难度。 如果以后仍然有 ...",
+    "host_name": "zhuanlan.zhihu.com",
+    "rank": 4,
+    "date": "2021年10月10日",
+    "favicon": ""
+  },
+  {
+    "url": "https://maimai.shiftpsh.com",
+    "name": "等級達成率分布",
+    "snippet": "等級達成率 分布 ... 難度小數點以模糊顯示的曲目，表示目前版本尚無已知定數。這些數值是根據目測的難度及之前版本的定數而估算，可能不準確。 譜面定數來源為 maimai 譜面定数 ...",
+    "host_name": "maimai.shiftpsh.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

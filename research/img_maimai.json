@@ -1,0 +1,51 @@
+{
+  "success": true,
+  "query": "maimai DX arcade machine rhythm game",
+  "count": 6,
+  "ranked": true,
+  "captioned_count": 6,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/3c22b094543f.jpg",
+      "caption": "A man plays the glowing circular Sega MaiMai DX arcade machine, screen showing \"HOLD,\" captioned \"MaiMai DX (Tutorial), Sega Amusements, IAAPA 2025.\"",
+      "source": "YouTube",
+      "original_width": "1280px",
+      "original_height": "720px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/7cc44e6a8323.png",
+      "caption": "The image is a promotional graphic for maimai, a SEGA arcade music game, showing two DX cabinets beside explanatory text. Text: \"maimai is a 'Music Game'!\" plus gameplay instructions. Contains substantial text; not a background image.",
+      "source": "maimai ©SEGA",
+      "original_width": "1800px",
+      "original_height": "1148px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/e99c7be75333.jpg",
+      "caption": "A maimai UNiVERSE arcade rhythm game machine with dual round screens, colorful buttons, logo text, and HOBBY SEARCH watermark.",
+      "source": "www.1999.co.jp",
+      "original_width": "1200px",
+      "original_height": "1200px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/568aa29c928c.jpeg",
+      "caption": "Indoor capsule sleeping pods (white circular windows) beside a curtained balcony at night, with stools and a colorful floor mat.",
+      "source": "Reddit",
+      "original_width": "5712px",
+      "original_height": "4284px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/4dba788eb922.jpg",
+      "caption": "Two illuminated maimai DX arcade rhythm game machines in a dark room, with colorful screens, stools, and rainbow-branded floor mats.",
+      "source": "Zenius -I- vanisher.com",
+      "original_width": "2048px",
+      "original_height": "1153px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/b543ec1b2830.png",
+      "caption": "Product image of maimai DX \"MAGiCAL\" arcade rhythm game machine, white dual-screen cabinets with green logo, no watermark, suitable for background image.",
+      "source": "PR TIMES",
+      "original_width": "850px",
+      "original_height": "1078px"
+    }
+  ]
+}
