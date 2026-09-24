@@ -18,7 +18,7 @@ const JUDGES = [
   { name: 'CRITICAL PERFECT', color: 'mm-rainbow-text', desc: '±33ms 完美中心' },
   { name: 'PERFECT', color: 'text-amber-300', desc: '±67ms' },
   { name: 'GREAT', color: 'text-pink-400', desc: '±100ms，维持连击' },
-  { name: 'GOOD', color: 'text-purple-300', desc: '±134ms，断连击' },
+  { name: 'GOOD', color: 'text-green-300', desc: '±134ms，断连击' },
   { name: 'MISS', color: 'text-slate-400', desc: '错过音符' },
 ];
 
@@ -126,7 +126,7 @@ export default function HowtoOverlay({
             </section>
 
             {/* 计分 */}
-            <section className="mb-2">
+            <section className="mb-7">
               <h4 className="font-black text-lg mb-3 text-white/90">🏆 计分系统（对齐 maimai DX）</h4>
               <div className="text-sm text-white/70 space-y-2 leading-relaxed">
                 <p>· <b className="text-cyan-200">达成率</b>：满分 100%，BREAK 音符加成可超过 100%，理论上限 101%</p>
@@ -134,6 +134,26 @@ export default function HowtoOverlay({
                 <p>· <b className="text-cyan-200">AP / FC</b>：全 PERFECT 以上 = ALL PERFECT；无 GOOD/MISS = FULL COMBO</p>
                 <p>· <b className="text-cyan-200">DX Rating</b>：定数 × 达成率 × 评级系数（如 SSS+ 0.224）</p>
                 <p>· <b className="text-cyan-200">DX 分数</b>：CP=3 / P=2 / GR=1，满分 = 判定数 × 3</p>
+              </div>
+            </section>
+
+            {/* 谱面类型 */}
+            <section className="mb-7">
+              <h4 className="font-black text-lg mb-3 text-white/90">💿 谱面类型 STD / DX</h4>
+              <div className="text-sm text-white/70 space-y-2 leading-relaxed">
+                <p>· <b className="text-green-300">STD（STANDARD）</b>：旧世代白谱，无 TOUCH 触摸音符，纯按键谱面</p>
+                <p>· <b className="text-amber-300">DX（DELUXE）</b>：黄谱，包含 TOUCH 触摸音符与更复杂的配置</p>
+                <p>· 每首曲目的 STD / DX 谱面难度相互独立，成绩分开记录；选曲时按 <kbd className="kbd">Tab</kbd> 或点击切换</p>
+              </div>
+            </section>
+
+            {/* 来源声明 */}
+            <section className="mb-2">
+              <h4 className="font-black text-lg mb-3 text-white/90">ℹ️ 关于本复刻</h4>
+              <div className="text-sm text-white/70 space-y-2 leading-relaxed">
+                <p>· 曲目元数据（标题 / 艺术家 / 分类 / 版本 / 难度）来自国服《舞萌DX》曲目数据库，共 20 首真实曲目</p>
+                <p>· 封面图为游戏内真实封面；音乐为 Web Audio 合成引擎实时演奏的风格化编曲（非原版音频）</p>
+                <p>· 本项目为粉丝向非营利复刻，SEGA / maimai DX 相关权利归 SEGA 所有</p>
               </div>
             </section>
 

@@ -4,7 +4,7 @@
  * 游戏画面 — Canvas 渲染 + 引擎 + 输入接线
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { Difficulty, GameSettings, PlayResult, SongDef } from '@/lib/maimai/types';
+import type { ChartType, Difficulty, GameSettings, PlayResult, SongDef } from '@/lib/maimai/types';
 import { generateChart } from '@/lib/maimai/chartgen';
 import { MaimaiEngine } from '@/lib/maimai/engine';
 import { PlayfieldRenderer } from '@/lib/maimai/renderer';
@@ -14,10 +14,11 @@ import { SFX } from '@/lib/audio/instruments';
 import { KEY_HELP } from '@/lib/maimai/input';
 
 export default function GameScreen({
-  song, difficulty, settings, seq, onFinish, onQuit, onRetry,
+  song, difficulty, chartType, settings, seq, onFinish, onQuit, onRetry,
 }: {
   song: SongDef;
   difficulty: Difficulty;
+  chartType: ChartType;
   settings: GameSettings;
   seq: MusicSequencer;
   onFinish: (r: PlayResult) => void;
@@ -36,8 +37,8 @@ export default function GameScreen({
     if (!canvas) return;
 
     // 谱面 + 引擎
-    const chart = generateChart(song, difficulty);
-    const engine = new MaimaiEngine({ song, chart, difficulty, settings, sequencer: seq });
+    const chart = generateChart(song, difficulty, chartType);
+    const engine = new MaimaiEngine({ song, chart, difficulty, chartType, settings, sequencer: seq });
     engineRef.current = engine;
     const renderer = new PlayfieldRenderer(canvas, engine, song);
     // 调试句柄（开发期自检用）

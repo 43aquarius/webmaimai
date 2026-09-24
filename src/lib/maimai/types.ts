@@ -6,9 +6,17 @@ export type Judgement = 'CP' | 'PERFECT' | 'GREAT' | 'GOOD' | 'MISS';
 
 export type NoteType = 'TAP' | 'HOLD' | 'SLIDE' | 'TOUCH' | 'BREAK';
 
+/** 谱面类型：STD（旧白谱） / DX（黄谱，含触摸） */
+export type ChartType = 'STD' | 'DX';
+
 export type Difficulty = 'BASIC' | 'ADVANCED' | 'EXPERT' | 'MASTER' | 'REMASTER';
 
 export const DIFFICULTIES: Difficulty[] = ['BASIC', 'ADVANCED', 'EXPERT', 'MASTER', 'REMASTER'];
+
+export const CHART_TYPE_INFO: Record<ChartType, { label: string; color: string; bg: string }> = {
+  STD: { label: 'STANDARD', color: '#3ddc84', bg: 'rgba(61,220,132,0.18)' },
+  DX: { label: 'DELUXE', color: '#ffd34d', bg: 'rgba(255,211,77,0.18)' },
+};
 
 export const DIFF_INFO: Record<Difficulty, { label: string; short: string; color: string; color2: string }> = {
   BASIC: { label: 'BASIC', short: '绿', color: '#22c55e', color2: '#0e7a37' },
@@ -54,13 +62,13 @@ export const JUDGE_WINDOWS: Record<Judgement, number> = {
   MISS: 999,
 };
 
-/** 判定显示信息 */
+/** 判定显示信息（官方配色：PERFECT 金黄 / GREAT 粉 / GOOD 绿 / MISS 灰） */
 export const JUDGE_TEXT: Record<Judgement, { text: string; color: string; rainbow?: boolean }> = {
   CP: { text: 'CRITICAL PERFECT', color: '#ffe95c', rainbow: true },
   PERFECT: { text: 'PERFECT', color: '#ffd84a' },
   GREAT: { text: 'GREAT', color: '#ff5fa8' },
-  GOOD: { text: 'GOOD', color: '#a78fd4' },
-  MISS: { text: 'MISS', color: '#6b83a8' },
+  GOOD: { text: 'GOOD', color: '#7dff7d' },
+  MISS: { text: 'MISS', color: '#8b9dc3' },
 };
 
 /** 谱面音符（生成产物） */
@@ -78,6 +86,7 @@ export interface ChartCounts {
 
 export interface CompiledChart {
   difficulty: Difficulty;
+  chartType: ChartType;    // STD / DX
   level: number;         // 谱面定数
   levelText: string;     // "12" / "13+"
   notes: ChartNote[];    // 按 t 排序
@@ -143,16 +152,43 @@ export interface SongDef {
   title: string;
   titleSub?: string;
   artist: string;
-  genre: string;
+  genre: string;          // 风格描述（自由文本）
+  category: string;       // 官方分类（选曲页签）
+  version: string;        // 收录版本
   bpm: number;
   /** 调性：主音 MIDI 与音阶 */
   key: { root: number; scale: 'minor' | 'major' | 'dorian' };
+  /** 摆动节奏强度 0-1（爵士用） */
+  swing?: number;
   jacket: string;
   color: string;
   color2: string;
   previewBeat: number;
   sections: SectionDef[];
-  charts: Partial<Record<Difficulty, number>>;  // 难度 → 定数
+  /** STD（白谱）定数 */
+  stdCharts?: Partial<Record<Difficulty, number>>;
+  /** DX（黄谱）定数 */
+  dxCharts?: Partial<Record<Difficulty, number>>;
+  /** 谱面装饰用风格标记 */
+  style?: string;
+}
+
+/** 难度定数 → 显示文本（"12" / "12+"），避免浮点误差 */
+export function lvText(lv: number): string {
+  const frac = Math.round((lv - Math.floor(lv)) * 10);
+  return `${Math.floor(lv)}${frac >= 7 ? '+' : ''}`;
+}
+
+/** 全部可用谱面类型 */
+export function chartTypesOf(song: SongDef): ChartType[] {
+  const out: ChartType[] = [];
+  if (song.stdCharts && Object.keys(song.stdCharts).length > 0) out.push('STD');
+  if (song.dxCharts && Object.keys(song.dxCharts).length > 0) out.push('DX');
+  return out;
+}
+
+export function chartsOf(song: SongDef, type: ChartType): Partial<Record<Difficulty, number>> {
+  return (type === 'DX' ? song.dxCharts : song.stdCharts) ?? {};
 }
 
 /* ---------------- 游戏结果 ---------------- */
@@ -164,6 +200,7 @@ export interface JudgementCounts {
 export interface PlayResult {
   songId: string;
   difficulty: Difficulty;
+  chartType: ChartType;
   level: number;
   achievement: number;      // 0-101.xxxx（百分比数值）
   rank: string;

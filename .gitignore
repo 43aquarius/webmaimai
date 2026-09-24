@@ -52,3 +52,15 @@ prompt
 server.log
 # Skills directory
 /skills/
+# 项目脚手架与本地开发产物（非游戏本体）
+/research/
+/examples/
+/mini-services/
+/tests/
+/upload/
+/db/
+/prisma/
+/download/
+/skills/
+/dev.log
+/agent-ctx/

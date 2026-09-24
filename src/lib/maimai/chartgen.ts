@@ -7,10 +7,11 @@
  * - HOLD 对应长音旋律、SLIDE 对应过渡段/副歌、TOUCH 对应安静段、BREAK 对应重音
  */
 import type {
-  ChartNote, CompiledChart, Difficulty, MusicEvent, SongDef,
+  ChartNote, ChartType, CompiledChart, Difficulty, MusicEvent, SongDef,
 } from './types';
 import { compileMusic } from './score';
 import { NOTE_BASE } from './types';
+import { chartsOf, lvText } from './types';
 
 /* ---------- 确定性随机 ---------- */
 function mulberry32(seed: number) {
@@ -45,12 +46,18 @@ interface DiffProfile {
 }
 
 const PROFILES: Record<Difficulty, DiffProfile> = {
-  BASIC: { density: 0.8, grid: 4, maxSimul: 1, holdChance: 0.8, slideChance: 0, touchChance: 0, breakEveryBeats: 60, stream16th: 0, stairs: 0.15 },
-  ADVANCED: { density: 1.15, grid: 8, maxSimul: 2, holdChance: 0.7, slideChance: 0.3, touchChance: 0.1, breakEveryBeats: 40, stream16th: 0.1, stairs: 0.3 },
-  EXPERT: { density: 1.7, grid: 16, maxSimul: 2, holdChance: 0.55, slideChance: 0.55, touchChance: 0.4, breakEveryBeats: 24, stream16th: 0.45, stairs: 0.55 },
-  MASTER: { density: 2.55, grid: 16, maxSimul: 3, holdChance: 0.5, slideChance: 0.75, touchChance: 0.7, breakEveryBeats: 16, stream16th: 0.8, stairs: 0.8 },
-  REMASTER: { density: 2.85, grid: 16, maxSimul: 4, holdChance: 0.55, slideChance: 0.9, touchChance: 0.85, breakEveryBeats: 12, stream16th: 0.9, stairs: 0.9 },
+  BASIC: { density: 1.6, grid: 4, maxSimul: 1, holdChance: 0.8, slideChance: 0, touchChance: 0, breakEveryBeats: 60, stream16th: 0, stairs: 0.15 },
+  ADVANCED: { density: 2.3, grid: 8, maxSimul: 2, holdChance: 0.7, slideChance: 0.3, touchChance: 0.1, breakEveryBeats: 40, stream16th: 0.1, stairs: 0.3 },
+  EXPERT: { density: 3.4, grid: 16, maxSimul: 2, holdChance: 0.55, slideChance: 0.55, touchChance: 0.4, breakEveryBeats: 24, stream16th: 0.45, stairs: 0.55 },
+  MASTER: { density: 5.0, grid: 16, maxSimul: 3, holdChance: 0.5, slideChance: 0.75, touchChance: 0.7, breakEveryBeats: 16, stream16th: 0.8, stairs: 0.8 },
+  REMASTER: { density: 5.6, grid: 16, maxSimul: 4, holdChance: 0.55, slideChance: 0.9, touchChance: 0.85, breakEveryBeats: 12, stream16th: 0.9, stairs: 0.9 },
 };
+
+/** 定数 → 密度缩放（低定数稀疏 / 高定数密集） */
+function levelScale(level: number): number {
+  const s = 0.62 + (level - 1) * 0.043;
+  return Math.min(1.45, Math.max(0.55, s));
+}
 
 /* ---------- 音乐骨架分析 ---------- */
 interface StepInfo {
@@ -124,10 +131,20 @@ function analyze(song: SongDef) {
 }
 
 /* ---------- 生成器 ---------- */
-export function generateChart(song: SongDef, difficulty: Difficulty): CompiledChart {
-  const level = song.charts[difficulty] ?? 5.0;
-  const prof = PROFILES[difficulty];
-  const rnd = mulberry32(hashStr(song.id + difficulty));
+export function generateChart(song: SongDef, difficulty: Difficulty, chartType: ChartType = 'DX'): CompiledChart {
+  const level = chartsOf(song, chartType)[difficulty] ?? 5.0;
+  const prof: DiffProfile = { ...PROFILES[difficulty] };   // 克隆，避免污染全局
+  if (chartType === 'STD') {
+    prof.density *= 0.92;
+    prof.touchChance = 0;
+    prof.slideChance = Math.max(0, prof.slideChance - 0.1);
+    if (prof.maxSimul >= 3) prof.maxSimul -= 1;
+  }
+  const scale = levelScale(level);
+  prof.density *= scale;
+  prof.stream16th = Math.min(1, prof.stream16th * scale);
+  prof.breakEveryBeats /= scale;
+  const rnd = mulberry32(hashStr(song.id + difficulty + chartType));
   const { steps, totalSteps, spb, sectionSpans } = analyze(song);
 
   const notes: ChartNote[] = [];
@@ -357,10 +374,11 @@ export function generateChart(song: SongDef, difficulty: Difficulty): CompiledCh
   counts.total = final.length;
   const totalJudgments = final.length + counts.hold;
 
-  const levelText = `${Math.floor(level)}${level % 1 >= 0.7 ? '+' : ''}`;
+  const levelText = lvText(level);
 
   return {
     difficulty,
+    chartType,
     level,
     levelText,
     notes: final,

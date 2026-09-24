@@ -3,7 +3,7 @@
  * 还原 maimai DX：8 键环 / 音符外飞 / 判定特效 / HUD
  */
 import type { CompiledChart, Judgement, SongDef } from './types';
-import { JUDGE_TEXT } from './types';
+import { JUDGE_TEXT, lvText as lvTextOf } from './types';
 import type { MaimaiEngine, EngineEvent, RuntimeNote } from './engine';
 
 const FONT = '"M PLUS Rounded 1c", "Yuanti SC", "PingFang SC", "Microsoft YaHei", sans-serif';
@@ -823,6 +823,13 @@ export class PlayfieldRenderer {
     ctx.shadowColor = 'rgba(0,0,0,0.7)';
     ctx.shadowBlur = this.R * 0.02;
     ctx.fillText(info.text, 0, 0);
+
+    // FAST / SLOW 指示（官方设定：GREAT/GOOD 时显示快慢）
+    if ((j.j === 'GREAT' || j.j === 'GOOD') && Math.abs(j.delta) > 0.016) {
+      ctx.font = `900 ${Math.round(this.R * 0.036)}px ${FONT}`;
+      ctx.fillStyle = j.delta < 0 ? '#5ec8ff' : '#ffb84d';
+      ctx.fillText(j.delta < 0 ? 'FAST' : 'SLOW', 0, this.R * 0.075);
+    }
     ctx.restore();
   }
 
@@ -854,7 +861,7 @@ export class PlayfieldRenderer {
     ctx.textAlign = 'left';
     const diffLabel = eng.difficulty === 'REMASTER' ? 'Re:MASTER' : eng.difficulty;
     const lv = chart.level;
-    const lvText = `${Math.floor(lv)}${lv % 1 >= 0.7 ? '+' : ''}`;
+    const lvText = lvTextOf(lv);
     ctx.font = `900 ${Math.round(this.R * 0.034)}px ${FONT}`;
     const pillTextW = ctx.measureText(`${diffLabel} ${lvText}`).width;
     ctx.fillStyle = this.diffColor(eng.difficulty);
@@ -862,6 +869,24 @@ export class PlayfieldRenderer {
     ctx.fill();
     ctx.fillStyle = eng.difficulty === 'ADVANCED' || eng.difficulty === 'REMASTER' ? '#3a2200' : '#fff';
     ctx.fillText(`${diffLabel} ${lvText}`, this.w * 0.022 + this.R * 0.025, this.h * 0.03 + this.R * 0.037);
+    // 谱面类型徽章（STD 绿 / DX 黄）
+    {
+      const isDx = eng.chartType === 'DX';
+      const bx = this.w * 0.022 + pillTextW + this.R * 0.07;
+      const bw = this.R * 0.075;
+      ctx.font = `900 ${Math.round(this.R * 0.028)}px ${FONT}`;
+      ctx.fillStyle = isDx ? 'rgba(255,211,77,0.22)' : 'rgba(61,220,132,0.22)';
+      this.roundRect(bx, this.h * 0.03, bw, this.R * 0.052, this.R * 0.012);
+      ctx.fill();
+      ctx.strokeStyle = isDx ? '#ffd34d' : '#3ddc84';
+      ctx.lineWidth = 1.5;
+      this.roundRect(bx, this.h * 0.03, bw, this.R * 0.052, this.R * 0.012);
+      ctx.stroke();
+      ctx.fillStyle = isDx ? '#ffd34d' : '#3ddc84';
+      ctx.textAlign = 'center';
+      ctx.fillText(isDx ? 'DX' : 'STD', bx + bw / 2, this.h * 0.03 + this.R * 0.037);
+      ctx.textAlign = 'left';
+    }
     ctx.fillStyle = 'rgba(140, 200, 255, 0.95)';
     ctx.font = `800 ${Math.round(this.R * 0.03)}px ${FONT}`;
     ctx.fillText('TRACK 01', this.w * 0.025, this.h * 0.03 + this.R * 0.085);

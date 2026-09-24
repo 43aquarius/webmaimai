@@ -1,12 +1,12 @@
 'use client';
 
 /**
- * 选曲界面 — DX 风格封面转盘 / 难度选择 / 试听
+ * 选曲界面 — DX 风格封面转盘 / 谱面类型(STD/DX) / 难度选择 / 试听
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { Difficulty, SongDef } from '@/lib/maimai/types';
-import { DIFF_INFO, DIFFICULTIES } from '@/lib/maimai/types';
+import type { ChartType, Difficulty, SongDef } from '@/lib/maimai/types';
+import { CHART_TYPE_INFO, DIFF_INFO, DIFFICULTIES, chartTypesOf, chartsOf, lvText } from '@/lib/maimai/types';
 import { generateChart } from '@/lib/maimai/chartgen';
 import { getBest, totalRating } from '@/lib/maimai/storage';
 import { fmtAchievement, rankColor } from '@/lib/maimai/scoring';
@@ -15,8 +15,8 @@ import { SFX } from '@/lib/audio/instruments';
 
 export default function SongSelect({
   seq, songs, genres, genre, onGenre,
-  onSong, onDifficulty, onPlay, onBack, onSettings, onHowto,
-  selectedSong, selectedDifficulty, unlockAudio,
+  onSong, onDifficulty, onChartType, onPlay, onBack, onSettings, onHowto,
+  selectedSong, selectedDifficulty, selectedChartType, unlockAudio,
 }: {
   seq: MusicSequencer;
   songs: SongDef[];
@@ -25,36 +25,41 @@ export default function SongSelect({
   onGenre: (g: string) => void;
   onSong: (s: SongDef) => void;
   onDifficulty: (d: Difficulty) => void;
-  onPlay: (s: SongDef, d: Difficulty) => void;
+  onChartType: (t: ChartType) => void;
+  onPlay: (s: SongDef, d: Difficulty, t: ChartType) => void;
   onBack: () => void;
   onSettings: () => void;
   onHowto: () => void;
   selectedSong: SongDef;
   selectedDifficulty: Difficulty;
+  selectedChartType: ChartType;
   unlockAudio: () => void;
 }) {
   const [rating, setRating] = useState(0);
   const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setRating(totalRating()), 0);
     return () => clearTimeout(t);
   }, []);
 
-  // 焦点索引：完全由所选歌曲派生（单一数据源在父组件）
   const focusIdx = Math.max(0, songs.findIndex((s) => s.id === selectedSong.id));
   const focused = songs[focusIdx] ?? songs[0];
 
-  /* ---------- 谱面统计（同步派生，代价小） ---------- */
+  /* 谱面类型守恒：切歌后若当前类型不可用则切到可用类型 */
+  const availTypes = useMemo(() => chartTypesOf(focused), [focused]);
+  const chartType: ChartType = availTypes.includes(selectedChartType) ? selectedChartType : availTypes[0];
+  const charts = useMemo(() => chartsOf(focused, chartType), [focused, chartType]);
+
   const chartInfo = useMemo<{ total: number } | null>(() => {
     try {
-      const c = generateChart(focused, selectedDifficulty);
+      const c = generateChart(focused, selectedDifficulty, chartType);
       return { total: c.counts.total };
     } catch {
       return null;
     }
-  }, [focused, selectedDifficulty]);
+  }, [focused, selectedDifficulty, chartType]);
+
   useEffect(() => {
     if (!focused) return;
     if (previewTimer.current) clearTimeout(previewTimer.current);
@@ -74,18 +79,22 @@ export default function SongSelect({
   }, [focusIdx, songs, seq, onSong]);
 
   const moveDiff = useCallback((d: number) => {
-    const avail = DIFFICULTIES.filter((x) => focused.charts[x] !== undefined);
+    const avail = DIFFICULTIES.filter((x) => charts[x] !== undefined);
     const cur = avail.indexOf(selectedDifficulty);
     const next = avail[(cur + d + avail.length) % avail.length];
     if (seq.I) SFX.uiMove(seq.I, seq.audioTime);
     onDifficulty(next);
-  }, [focused, selectedDifficulty, seq, onDifficulty]);
+  }, [charts, selectedDifficulty, seq, onDifficulty]);
+
+  const switchType = useCallback((t: ChartType) => {
+    if (seq.I) SFX.uiMove(seq.I, seq.audioTime);
+    onChartType(t);
+  }, [seq, onChartType]);
 
   const play = useCallback(() => {
-    onPlay(focused, selectedDifficulty);
-  }, [focused, selectedDifficulty, onPlay]);
+    onPlay(focused, selectedDifficulty, chartType);
+  }, [focused, selectedDifficulty, chartType, onPlay]);
 
-  /* ---------- 键盘操作 ---------- */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       switch (e.code) {
@@ -93,6 +102,7 @@ export default function SongSelect({
         case 'ArrowRight': e.preventDefault(); move(1); break;
         case 'ArrowUp': e.preventDefault(); moveDiff(-1); break;
         case 'ArrowDown': e.preventDefault(); moveDiff(1); break;
+        case 'Tab': e.preventDefault(); switchType(availTypes[(availTypes.indexOf(chartType) + 1) % availTypes.length]); break;
         case 'Enter': e.preventDefault(); play(); break;
         case 'Escape': e.preventDefault(); onBack(); break;
         default: break;
@@ -100,15 +110,15 @@ export default function SongSelect({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [move, moveDiff, play, onBack]);
+  }, [move, moveDiff, play, onBack, switchType, availTypes, chartType]);
 
   const availDiffs = useMemo(
-    () => DIFFICULTIES.filter((d) => focused.charts[d] !== undefined),
-    [focused],
+    () => DIFFICULTIES.filter((d) => charts[d] !== undefined),
+    [charts],
   );
 
   return (
-    <div ref={rootRef} className="fixed inset-0 overflow-hidden" tabIndex={-1}>
+    <div className="fixed inset-0 overflow-hidden" tabIndex={-1}>
       {/* 背景（歌曲主题色） */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -128,12 +138,12 @@ export default function SongSelect({
       </AnimatePresence>
 
       {/* 顶栏：分类 Tab */}
-      <div className="relative z-10 flex items-center gap-2 px-4 md:px-8 pt-4 flex-wrap">
+      <div className="relative z-10 flex items-center gap-1.5 md:gap-2 px-3 md:px-8 pt-3 md:pt-4 flex-wrap">
         {genres.map((g) => (
           <button
             key={g}
             onClick={() => { if (seq.I) SFX.uiMove(seq.I, seq.audioTime); onGenre(g); }}
-            className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all cursor-pointer ${
+            className={`px-2.5 md:px-4 py-1.5 rounded-full text-xs md:text-sm font-bold transition-all cursor-pointer ${
               genre === g
                 ? 'bg-cyan-400 text-[#062033] shadow-[0_0_18px_rgba(62,230,255,0.5)]'
                 : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -153,28 +163,33 @@ export default function SongSelect({
       </div>
 
       {/* 主体三栏 */}
-      <div className="relative z-10 h-[calc(100%-190px)] flex items-center justify-center gap-4 md:gap-10 px-4 md:px-10 pt-2">
+      <div className="relative z-10 h-[calc(100%-210px)] flex items-center justify-center gap-4 md:gap-10 px-4 md:px-10 pt-2">
         {/* 左：歌曲信息 */}
         <div className="hidden lg:flex flex-col w-64 xl:w-72">
           <div className="text-cyan-300/80 text-xs tracking-[0.3em] font-bold mb-1">NOW SELECTING</div>
-          <h2 className="text-3xl font-black leading-tight" style={{ color: focused.color }}>
+          <h2 className="text-2xl xl:text-3xl font-black leading-tight" style={{ color: focused.color }}>
             {focused.title}
           </h2>
-          {focused.titleSub && (
-            <div className="text-white/50 text-sm mt-0.5">{focused.titleSub}</div>
-          )}
           <div className="mt-3 space-y-1 text-sm">
             <div className="flex justify-between border-b border-white/10 pb-1">
               <span className="text-white/50">艺术家</span>
-              <span className="font-bold">{focused.artist}</span>
+              <span className="font-bold text-right max-w-[190px] truncate">{focused.artist}</span>
             </div>
             <div className="flex justify-between border-b border-white/10 pb-1">
               <span className="text-white/50">分类</span>
-              <span className="font-bold">{focused.genre}</span>
+              <span className="font-bold">{focused.category}</span>
+            </div>
+            <div className="flex justify-between border-b border-white/10 pb-1">
+              <span className="text-white/50">版本</span>
+              <span className="font-bold">{focused.version}</span>
             </div>
             <div className="flex justify-between border-b border-white/10 pb-1">
               <span className="text-white/50">BPM</span>
               <span className="font-bold">{focused.bpm}</span>
+            </div>
+            <div className="flex justify-between border-b border-white/10 pb-1">
+              <span className="text-white/50">类型</span>
+              <span className="font-bold">{focused.genre}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-white/50">音符数</span>
@@ -184,9 +199,11 @@ export default function SongSelect({
 
           {/* 各难度最佳成绩 */}
           <div className="mt-4 space-y-1.5">
-            <div className="text-white/40 text-xs tracking-widest">最佳成绩</div>
+            <div className="text-white/40 text-xs tracking-widest">
+              最佳成绩 · {chartType === 'DX' ? 'DX 谱面' : 'STD 谱面'}
+            </div>
             {availDiffs.map((d) => {
-              const best = getBest(focused.id, d);
+              const best = getBest(focused.id, d, chartType);
               return (
                 <div key={d} className="flex items-center gap-2 text-sm">
                   <span
@@ -257,12 +274,11 @@ export default function SongSelect({
                     }`}
                     style={{ width: 'min(38vh, 30vw)' }}
                   >
-                    { }
                     <img src={s.jacket} alt={s.title} className="w-full h-full object-cover" draggable={false} />
                     {isFocus && (
                       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-3 pt-8 text-left">
                         <div className="font-black text-lg leading-tight">{s.title}</div>
-                        <div className="text-white/70 text-xs">{s.artist} · {s.genre}</div>
+                        <div className="text-white/70 text-xs truncate">{s.artist} · {s.version}</div>
                       </div>
                     )}
                   </div>
@@ -272,10 +288,7 @@ export default function SongSelect({
                       className="absolute -top-3 -right-3 w-14 h-14 rounded-full flex items-center justify-center font-black text-xl border-4 border-white shadow-lg"
                       style={{ background: DIFF_INFO[selectedDifficulty].color, color: selectedDifficulty === 'REMASTER' ? '#7a1fa8' : '#fff' }}
                     >
-                      {(() => {
-                        const lv = focused.charts[selectedDifficulty] ?? 0;
-                        return `${Math.floor(lv)}${lv % 1 >= 0.7 ? '+' : ''}`;
-                      })()}
+                      {lvText(charts[selectedDifficulty] ?? 0)}
                     </div>
                   )}
                 </motion.button>
@@ -290,6 +303,7 @@ export default function SongSelect({
             <div className="text-white/40 text-xs tracking-widest mb-1">操作</div>
             <div className="flex items-center gap-2"><kbd className="kbd">←</kbd><kbd className="kbd">→</kbd><span className="text-white/70">切歌</span></div>
             <div className="flex items-center gap-2"><kbd className="kbd">↑</kbd><kbd className="kbd">↓</kbd><span className="text-white/70">难度</span></div>
+            <div className="flex items-center gap-2"><kbd className="kbd">Tab</kbd><span className="text-white/70">STD/DX</span></div>
             <div className="flex items-center gap-2"><kbd className="kbd">Enter</kbd><span className="text-white/70">决定</span></div>
             <div className="flex items-center gap-2"><kbd className="kbd">Esc</kbd><span className="text-white/70">返回</span></div>
           </div>
@@ -303,12 +317,38 @@ export default function SongSelect({
         </div>
       </div>
 
-      {/* 底部：难度选择条 */}
+      {/* 底部：谱面类型 + 难度选择条 */}
       <div className="absolute bottom-4 left-0 right-0 z-10 px-4 md:px-8">
+        {/* STD / DX 切换 */}
+        {availTypes.length > 1 && (
+          <div className="flex items-center justify-center gap-2 mb-2.5">
+            {availTypes.map((t) => {
+              const active = t === chartType;
+              const info = CHART_TYPE_INFO[t];
+              return (
+                <button
+                  key={t}
+                  onClick={() => switchType(t)}
+                  className={`relative px-6 py-1.5 rounded-full font-black text-sm tracking-widest transition-all cursor-pointer border-2 ${
+                    active ? 'scale-105' : 'opacity-50 hover:opacity-90'
+                  }`}
+                  style={{
+                    background: active ? info.bg : 'rgba(255,255,255,0.04)',
+                    borderColor: info.color,
+                    color: info.color,
+                    boxShadow: active ? `0 0 18px ${info.color}55` : 'none',
+                  }}
+                >
+                  {t === 'DX' ? '★ DX' : 'STD'}
+                  <span className="ml-2 text-[10px] opacity-80">{info.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
         <div className="flex items-center justify-center gap-2 md:gap-3">
           {availDiffs.map((d) => {
-            const lv = focused.charts[d] ?? 0;
-            const lvText = `${Math.floor(lv)}${lv % 1 >= 0.7 ? '+' : ''}`;
+            const lv = charts[d] ?? 0;
             const active = d === selectedDifficulty;
             return (
               <button
@@ -325,7 +365,7 @@ export default function SongSelect({
                 }}
               >
                 <div className="text-[10px] md:text-xs tracking-wider leading-none mb-1">{DIFF_INFO[d].label}</div>
-                <div className="text-xl md:text-2xl leading-none">{lvText}</div>
+                <div className="text-xl md:text-2xl leading-none">{lvText(lv)}</div>
                 {active && (
                   <div className="absolute inset-0 pointer-events-none" style={{ animation: 'mm-shine 1.8s infinite' }}>
                     <div className="absolute inset-y-0 w-1/3 bg-white/25 blur-md" />
@@ -334,7 +374,6 @@ export default function SongSelect({
               </button>
             );
           })}
-          {/* 移动端开始按钮 */}
           <button
             onClick={play}
             className="lg:hidden ml-2 px-6 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-cyan-400 text-[#081226] font-black text-lg cursor-pointer active:scale-95 transition-transform"
@@ -343,7 +382,7 @@ export default function SongSelect({
           </button>
         </div>
         <div className="mt-2 text-center text-white/35 text-xs tracking-widest">
-          ← → 选择乐曲 · ↑ ↓ 选择难度 · ENTER 决定 · ESC 返回
+          ← → 选择乐曲 · ↑ ↓ 选择难度 {availTypes.length > 1 && '· TAB 切换 STD/DX'} · ENTER 决定 · ESC 返回
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 /**
  * 本地存储 — 设置 / 最佳成绩 / Rating 汇总
  */
-import type { BestRecord, GameSettings, PlayResult } from './types';
+import type { BestRecord, ChartType, GameSettings, PlayResult } from './types';
 import { DEFAULT_SETTINGS } from './types';
 
 const KEY = 'maimai-web-save-v1';
@@ -42,8 +42,9 @@ export function setSettings(s: GameSettings) {
   save(d);
 }
 
-export function getBest(songId: string, diff: string): BestRecord | null {
-  return load().best[`${songId}:${diff}`] ?? null;
+export function getBest(songId: string, diff: string, chartType: string = 'DX'): BestRecord | null {
+  const best = load().best;
+  return best[`${songId}:${chartType}:${diff}`] ?? best[`${songId}:${diff}`] ?? null;
 }
 
 export function getAllBest(): Record<string, BestRecord> {
@@ -52,7 +53,7 @@ export function getAllBest(): Record<string, BestRecord> {
 
 export function recordResult(r: PlayResult): { isNewBest: boolean } {
   const d = load();
-  const key = `${r.songId}:${r.difficulty}`;
+  const key = `${r.songId}:${r.chartType}:${r.difficulty}`;
   const prev = d.best[key];
   if (r.autoplay) return { isNewBest: false };
   const better = !prev || r.achievement > prev.achievement;

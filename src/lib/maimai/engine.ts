@@ -2,7 +2,7 @@
  * 游戏引擎 — 判定 / 连击 / 计分 / 自动演示
  */
 import type {
-  ChartNote, CompiledChart, Difficulty, GameSettings, Judgement,
+  ChartNote, ChartType, CompiledChart, Difficulty, GameSettings, Judgement,
   JudgementCounts, PlayResult, SongDef,
 } from './types';
 import { JUDGE_WINDOWS } from './types';
@@ -33,6 +33,7 @@ export class MaimaiEngine {
   readonly song: SongDef;
   readonly chart: CompiledChart;
   readonly difficulty: Difficulty;
+  readonly chartType: ChartType;
   readonly settings: GameSettings;
   readonly sequencer: MusicSequencer;
   readonly autoPlay: boolean;
@@ -55,12 +56,13 @@ export class MaimaiEngine {
   private endTimer = 0;
 
   constructor(opts: {
-    song: SongDef; chart: CompiledChart; difficulty: Difficulty;
+    song: SongDef; chart: CompiledChart; difficulty: Difficulty; chartType?: ChartType;
     settings: GameSettings; sequencer: MusicSequencer;
   }) {
     this.song = opts.song;
     this.chart = opts.chart;
     this.difficulty = opts.difficulty;
+    this.chartType = opts.chart?.chartType ?? opts.chartType ?? 'DX';
     this.settings = opts.settings;
     this.sequencer = opts.sequencer;
     this.autoPlay = opts.settings.autoPlay;
@@ -249,7 +251,7 @@ export class MaimaiEngine {
       const delta = now - targetTime;
       const abs = Math.abs(delta);
       if (abs > JUDGE_WINDOWS.GOOD / 1000 + 0.02) continue;
-      const j = this.judgeOf(abs, n.type === 'TOUCH');
+      const j = this.judgeOf(abs);
       if (!best || abs < Math.abs(best.delta)) best = { rn, j, delta };
     }
     return best;
@@ -356,6 +358,7 @@ export class MaimaiEngine {
     return {
       songId: this.song.id,
       difficulty: this.difficulty,
+      chartType: this.chartType,
       level,
       achievement: ach,
       rank: rankOf(ach),

@@ -5,8 +5,8 @@
 import { SONGS } from '../src/lib/maimai/songs';
 import { compileMusic } from '../src/lib/maimai/score';
 import { generateChart } from '../src/lib/maimai/chartgen';
-import { DIFFICULTIES } from '../src/lib/maimai/types';
-import type { Difficulty } from '../src/lib/maimai/types';
+import { DIFFICULTIES, chartTypesOf, chartsOf } from '../src/lib/maimai/types';
+import type { ChartType, Difficulty } from '../src/lib/maimai/types';
 
 let fail = 0;
 
@@ -29,9 +29,11 @@ for (const song of SONGS) {
     prev = e.t;
   }
 
-  for (const diff of DIFFICULTIES) {
-    if (song.charts[diff] === undefined) continue;
-    const chart = generateChart(song, diff);
+  for (const type of chartTypesOf(song) as ChartType[]) {
+    for (const diff of DIFFICULTIES) {
+      const lv = chartsOf(song, type)[diff];
+      if (lv === undefined) continue;
+      const chart = generateChart(song, diff, type);
     const nps = chart.counts.total / dur;
     // 检查排序/冲突
     let orderOk = true;
@@ -50,7 +52,7 @@ for (const song of SONGS) {
     const sorted = chart.notes.every((n, i, a) => i === 0 || a[i - 1].t <= n.t + 1e-9);
     if (!sorted) orderOk = false;
     console.log(
-      `  ${diff.padEnd(9)} 定数${song.charts[diff]} → ${String(chart.counts.total).padStart(4)} notes ` +
+      `  ${type} ${diff.padEnd(9)} 定数${lv} → ${String(chart.counts.total).padStart(4)} notes ` +
       `(${nps.toFixed(1)}/s) TAP${chart.counts.tap} HOLD${chart.counts.hold} SLI${chart.counts.slide} ` +
       `TCH${chart.counts.touch} BRK${chart.counts.break} | max=${chart.totalMax} 判定${chart.totalJudgments}` +
       `${orderOk ? '' : ' ⚠️乱序'}${conflicts ? ` ⚠️同键冲突${conflicts}` : ''}${badEnd ? ` ⚠️异常音符${badEnd}` : ''}`,
@@ -60,6 +62,7 @@ for (const song of SONGS) {
     if (nps > 7.5) { console.log('    ⚠️ 密度过高!'); fail++; }
     if (diff === 'BASIC' && nps > 2.2) { console.log('    ⚠️ BASIC 过密!'); fail++; }
     if (diff === 'MASTER' && nps < 2.5) { console.log('    ⚠️ MASTER 过疏!'); fail++; }
+    }
   }
 }
 

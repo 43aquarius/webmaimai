@@ -22,11 +22,11 @@ const CHORD_TONES: Record<string, number[]> = {
 };
 
 /** 音级 → MIDI（deg 可为任意整数，跨越八度自动进位） */
-export function degToMidi(root: number, scale: string[], deg: number, octave = 0): number {
-  const n = SCALES[scale] ?? SCALES.minor!;
+export function degToMidi(root: number, scaleName: string, deg: number, octave = 0): number {
+  const scaleArr: number[] = SCALES[scaleName] ?? SCALES.minor!;
   const oct = Math.floor(deg / 7);
   const idx = ((deg % 7) + 7) % 7;
-  return root + n[idx] + 12 * (oct + octave);
+  return root + scaleArr[idx] + 12 * (oct + octave);
 }
 
 /** 字符画节奏展开：字符串按小节平铺到 bars 小节 */
@@ -169,5 +169,18 @@ export function compileMusic(song: SongDef): CompiledMusic {
   }
 
   events.sort((a, b) => a.t - b.t);
+
+  // ---- Swing 后处理：三连摆（爵士等）
+  // 偶数 8 分的反拍（step%4==2）后移 2/12 拍，奇数 16 分后移 1/12 拍（swing=1 为标准三连摆）
+  if (song.swing && song.swing > 0) {
+    const s = song.swing / 12;
+    for (const e of events) {
+      const step16 = Math.round(e.t * 4);
+      if (step16 % 4 === 2) e.t += s * 2;
+      else if (step16 % 2 === 1) e.t += s;
+    }
+    events.sort((a, b) => a.t - b.t);
+  }
+
   return { events, totalBeats: beat, sectionSpans };
 }

@@ -5,7 +5,7 @@
  * title → select → game → results
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Difficulty, GameSettings, PlayResult, SongDef } from '@/lib/maimai/types';
+import type { ChartType, Difficulty, GameSettings, PlayResult, SongDef } from '@/lib/maimai/types';
 import { MusicSequencer } from '@/lib/audio/sequencer';
 import { SFX } from '@/lib/audio/instruments';
 import { SONGS, GENRES } from '@/lib/maimai/songs';
@@ -23,6 +23,7 @@ export default function Page() {
   const [screen, setScreen] = useState<Screen>('title');
   const [song, setSong] = useState<SongDef>(SONGS[0]);
   const [difficulty, setDifficulty] = useState<Difficulty>('MASTER');
+  const [chartType, setChartType] = useState<ChartType>('STD');
   const [genre, setGenre] = useState<string>('全部');
   const [result, setResult] = useState<PlayResult | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -70,11 +71,12 @@ export default function Page() {
     setScreen('select');
   }, [seq]);
 
-  const startGame = useCallback((s: SongDef, d: Difficulty) => {
+  const startGame = useCallback((s: SongDef, d: Difficulty, t: ChartType) => {
     unlockAudio();
     if (seq.I) SFX.songDecide(seq.I, seq.audioTime);
     setSong(s);
     setDifficulty(d);
+    setChartType(t);
     setScreen('game');
   }, [seq, unlockAudio]);
 
@@ -100,9 +102,16 @@ export default function Page() {
   }, [unlockAudio, settingsOpen, howtoOpen]);
 
   const songsOfGenre = useMemo(
-    () => (genre === '全部' ? SONGS : SONGS.filter((s) => s.genre === genre)),
+    () => (genre === '全部' ? SONGS : SONGS.filter((s) => s.category === genre)),
     [genre],
   );
+
+  // 分类切换后若当前选曲不在列表内，自动回到列表首曲
+  useEffect(() => {
+    if (screen === 'select' && !songsOfGenre.some((s) => s.id === song.id)) {
+      setSong(songsOfGenre[0] ?? SONGS[0]);
+    }
+  }, [songsOfGenre, screen, song.id]);
 
   return (
     <main className="fixed inset-0 bg-[#060a1c] text-white overflow-hidden">
@@ -126,26 +135,29 @@ export default function Page() {
           onGenre={setGenre}
           onSong={setSong}
           onDifficulty={setDifficulty}
+          onChartType={setChartType}
           onPlay={startGame}
           onBack={goTitle}
           onSettings={() => setSettingsOpen(true)}
           onHowto={() => setHowtoOpen(true)}
           selectedSong={song}
           selectedDifficulty={difficulty}
+          selectedChartType={chartType}
           unlockAudio={unlockAudio}
         />
       )}
 
       {screen === 'game' && (
         <GameScreen
-          key={`${song.id}:${difficulty}:${Date.now()}`}
+          key={`${song.id}:${difficulty}:${chartType}:${Date.now()}`}
           song={song}
           difficulty={difficulty}
+          chartType={chartType}
           settings={settings}
           seq={seq}
           onFinish={onGameFinish}
           onQuit={goSelect}
-          onRetry={() => startGame(song, difficulty)}
+          onRetry={() => startGame(song, difficulty, chartType)}
         />
       )}
 
@@ -153,7 +165,7 @@ export default function Page() {
         <ResultsScreen
           result={result}
           song={song}
-          onRetry={() => startGame(song, difficulty)}
+          onRetry={() => startGame(song, difficulty, chartType)}
           onSelect={goSelect}
         />
       )}

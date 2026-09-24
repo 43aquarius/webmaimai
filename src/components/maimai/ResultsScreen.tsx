@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { PlayResult, SongDef } from '@/lib/maimai/types';
-import { DIFF_INFO } from '@/lib/maimai/types';
+import { DIFF_INFO, lvText } from '@/lib/maimai/types';
 import { rankColor, fmtAchievement } from '@/lib/maimai/scoring';
 import { recordResult, totalRating } from '@/lib/maimai/storage';
 
@@ -95,11 +95,23 @@ export default function ResultsScreen({
           <div className="text-center">
             <div className="text-2xl font-black">{song.title}</div>
             <div className="text-white/60 text-sm">{song.artist}</div>
-            <div
-              className="inline-block mt-2 px-3 py-1 rounded-lg text-sm font-black"
-              style={{ background: diffInfo.color, color: result.difficulty === 'REMASTER' || result.difficulty === 'ADVANCED' ? '#3a2200' : '#fff' }}
-            >
-              {diffInfo.label} {Math.floor(result.level)}{result.level % 1 >= 0.7 ? '+' : ''}
+            <div className="flex items-center justify-center gap-2 mt-2">
+              <div
+                className="px-3 py-1 rounded-lg text-sm font-black"
+                style={{ background: diffInfo.color, color: result.difficulty === 'REMASTER' || result.difficulty === 'ADVANCED' ? '#3a2200' : '#fff' }}
+              >
+                {diffInfo.label} {lvText(result.level)}
+              </div>
+              <div
+                className="px-2.5 py-1 rounded-lg text-xs font-black border-2"
+                style={{
+                  color: result.chartType === 'DX' ? '#ffd34d' : '#3ddc84',
+                  borderColor: result.chartType === 'DX' ? '#ffd34d' : '#3ddc84',
+                  background: result.chartType === 'DX' ? 'rgba(255,211,77,0.15)' : 'rgba(61,220,132,0.15)',
+                }}
+              >
+                {result.chartType === 'DX' ? '★ DX 谱面' : 'STD 谱面'}
+              </div>
             </div>
             {result.autoplay && (
               <div className="mt-2 text-xs font-black text-amber-300" style={{ animation: 'mm-blink 1s infinite' }}>
