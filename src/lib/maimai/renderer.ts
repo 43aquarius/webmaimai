@@ -67,8 +67,11 @@ export class PlayfieldRenderer {
     const j = new Image();
     j.src = song.jacket;
     j.onload = () => { this.jacketImg = j; };
+    // 背景图：优先注入资源（单文件版），否则回退 public 路径
+    const inject = (window as unknown as { __ASSETS__?: Record<string, string> }).__ASSETS__;
+    const bgSrc = inject?.stage_wide ?? '/assets/bg/stage_wide.png';
     const b = new Image();
-    b.src = '/assets/bg/stage_wide.png';
+    b.src = bgSrc;
     b.onload = () => { this.bgImg = b; };
   }
 
